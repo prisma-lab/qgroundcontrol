@@ -42,6 +42,8 @@ public:
     QString             takeControlFlightMode           (void) const override { return _manualFlightMode; }
     QString             gotoFlightMode                  (void) const override { return _holdFlightMode; }
     QString             followFlightMode                (void) const override { return _followMeFlightMode; };
+    QString             prismaManualFlightMode          (void) const  { return _prismaManualFlightMode; };
+    QString             prismaOffboardFlightMode        (void) const  { return _prismaOffboardFlightMode; };
     void                pauseVehicle                    (Vehicle* vehicle) override;
     void                guidedModeRTL                   (Vehicle* vehicle, bool smartRTL) override;
     void                guidedModeLand                  (Vehicle* vehicle) override;
@@ -108,6 +110,8 @@ protected:
     QString _followMeFlightMode;
     QString _simpleFlightMode;
     QString _orbitFlightMode;
+    QString _prismaManualFlightMode;
+    QString _prismaOffboardFlightMode;
 
 private slots:
     void _mavCommandResult(int vehicleId, int component, int command, int result, bool noReponseFromVehicle);
