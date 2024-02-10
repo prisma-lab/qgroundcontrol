@@ -1,3 +1,6 @@
+# Custom QGC interface
+New custom QGC interface allows the user to select the new flight modes directly form the proper window.
+
 # QGroundControl Ground Control Station
 
 [![Releases](https://img.shields.io/github/release/mavlink/QGroundControl.svg)](https://github.com/mavlink/QGroundControl/releases)
