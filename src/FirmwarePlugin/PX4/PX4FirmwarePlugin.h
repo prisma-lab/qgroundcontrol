@@ -42,8 +42,12 @@ public:
     QString             takeControlFlightMode           (void) const override { return _manualFlightMode; }
     QString             gotoFlightMode                  (void) const override { return _holdFlightMode; }
     QString             followFlightMode                (void) const override { return _followMeFlightMode; };
-    QString             prismaManualFlightMode          (void) const  { return _prismaManualFlightMode; };
-    QString             prismaOffboardFlightMode        (void) const  { return _prismaOffboardFlightMode; };
+    // CUSTOM PRISMA MARINE
+    // QString             prismaAutoMarine                (void) const  { return _prismaAutoMarine; };
+    // QString             prismaMarineManual              (void) const  { return _prismaMarineManual; };
+    // QString             prismaMarineManualFF            (void) const  { return _prismaMarineManualFF; };
+    // QString             prismaMarineManualTS            (void) const  { return _prismaMarineManualTS; };
+    // END CUSTOM
     void                pauseVehicle                    (Vehicle* vehicle) override;
     void                guidedModeRTL                   (Vehicle* vehicle, bool smartRTL) override;
     void                guidedModeLand                  (Vehicle* vehicle) override;
@@ -110,8 +114,12 @@ protected:
     QString _followMeFlightMode;
     QString _simpleFlightMode;
     QString _orbitFlightMode;
-    QString _prismaManualFlightMode;
-    QString _prismaOffboardFlightMode;
+    // CUSTOM PRISMA MARINE
+    // QString _prismaAutoMarine;
+    // QString _prismaMarineManual;
+    // QString _prismaMarineManualFF;
+    // QString _prismaMarineManualTS;
+    // END CUSTOM
 
 private slots:
     void _mavCommandResult(int vehicleId, int component, int command, int result, bool noReponseFromVehicle);

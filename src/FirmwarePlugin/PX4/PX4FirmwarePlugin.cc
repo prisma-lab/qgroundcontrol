@@ -51,8 +51,10 @@ PX4FirmwarePlugin::PX4FirmwarePlugin()
     , _followMeFlightMode        (tr("Follow Me"))
     , _simpleFlightMode          (tr("Simple"))
     , _orbitFlightMode           (tr("Orbit"))
-    , _prismaManualFlightMode    (tr("Prisma Manual"))
-    , _prismaOffboardFlightMode  (tr("Prisma Offboard"))
+    // , _prismaAutoMarine          (tr("PRISMA Auto Marine"))
+    // , _prismaMarineManual        (tr("PRISMA Marine Manual"))
+    // , _prismaMarineManualFF      (tr("PRISMA Marine Manual FF"))
+    // , _prismaMarineManualTS      (tr("PRISMA Marine Manual TS"))
 {
     qmlRegisterType<PX4SimpleFlightModesController>     ("QGroundControl.Controllers", 1, 0, "PX4SimpleFlightModesController");
     qmlRegisterType<AirframeComponentController>        ("QGroundControl.Controllers", 1, 0, "AirframeComponentController");
@@ -87,8 +89,12 @@ PX4FirmwarePlugin::PX4FirmwarePlugin()
         { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_AUTO_READY,         false,  true,   true },
         { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_AUTO_RTGS,          false,  true,   true },
         { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_AUTO_TAKEOFF,       false,  true,   true },
-        { PX4_CUSTOM_MAIN_MODE_PRISMA,      PX4_CUSTOM_SUB_MODE_PRISMA_MAN,         true,   true,   true },
-        { PX4_CUSTOM_MAIN_MODE_PRISMA,      PX4_CUSTOM_SUB_MODE_PRISMA_1,           true,   false,  true },
+        // CUSTOM PRISMA MARINE
+        // { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_PRISMA_AUTO_MARINE,      true,   true,   true },
+        // { PX4_CUSTOM_MAIN_MODE_PRISMA,      PX4_CUSTOM_SUB_MODE_PRISMA_MARINE_MANUAL,    true,   true,   true },
+        // { PX4_CUSTOM_MAIN_MODE_PRISMA,      PX4_CUSTOM_SUB_MODE_PRISMA_MARINE_MANUAL_FF, true,   false,  true },
+        // { PX4_CUSTOM_MAIN_MODE_PRISMA,      PX4_CUSTOM_SUB_MODE_PRISMA_MARINE_MANUAL_TS, true,   false,  true },
+        // END CUSTOM
         
     };
 
@@ -112,8 +118,12 @@ PX4FirmwarePlugin::PX4FirmwarePlugin()
         &_readyFlightMode,
         &_rtgsFlightMode,
         &_takeoffFlightMode,
-        &_prismaManualFlightMode,
-        &_prismaOffboardFlightMode,
+        // CUSTOM PRISMA MARINE
+        // &_prismaAutoMarine,
+        // &_prismaMarineManual,
+        // &_prismaMarineManualFF,
+        // &_prismaMarineManualTS
+        // END CUSTOM
     };
 
     // Convert static information to dynamic list. This allows for plugin override class to manipulate list.
