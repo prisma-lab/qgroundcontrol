@@ -21,6 +21,11 @@ MapQuickItem {
 
     property var missionItem
     property int sequenceNumber
+    // CUSTOM PRISMA MARINE
+    property bool _isMarineWaypoint: missionItem
+                                        && missionItem.isSimpleItem
+                                        && missionItem.marineWaypoint
+    // END CUSTOM
 
     signal clicked
 
@@ -37,6 +42,9 @@ MapQuickItem {
             vehicleYaw:         missionItem.missionVehicleYaw
             showGimbalYaw:      !isNaN(missionItem.missionGimbalYaw)
             highlightSelected:  true
+            // CUSTOM PRISMA MARINE
+            marine:             _item._isMarineWaypoint
+            // END CUSTOM
             onClicked:          _item.clicked()
             opacity:            _item.opacity
 

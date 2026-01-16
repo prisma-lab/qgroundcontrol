@@ -40,6 +40,9 @@ public:
     Q_PROPERTY(bool             isLoiterItem            READ isLoiterItem                                       NOTIFY isLoiterItemChanged)
     Q_PROPERTY(bool             showLoiterRadius        READ showLoiterRadius                                   NOTIFY showLoiterRadiusChanged)
     Q_PROPERTY(double           loiterRadius            READ loiterRadius           WRITE setRadius             NOTIFY loiterRadiusChanged)
+    // CUSTOM PRISMA MARINE
+    Q_PROPERTY(bool             marineWaypoint          READ marineWaypoint                                    NOTIFY marineWaypointChanged)
+    // END CUSTOM
 
     /// Optional sections
     Q_PROPERTY(QObject*         speedSection            READ speedSection                                       NOTIFY speedSectionChanged)
@@ -76,6 +79,9 @@ public:
     bool            isLoiterItem        (void) const;
     bool            showLoiterRadius    (void) const;
     double          loiterRadius        (void) const;
+    // CUSTOM PRISMA MARINE
+    bool            marineWaypoint      (void) const { return _marineWaypoint; }
+    // END CUSTOM
 
     CameraSection*  cameraSection       (void) { return _cameraSection; }
     SpeedSection*   speedSection        (void) { return _speedSection; }
@@ -147,6 +153,9 @@ signals:
     void isLoiterItemChanged        (void);
     void showLoiterRadiusChanged    (void);
     void loiterRadiusChanged        (double loiterRadius);
+    // CUSTOM PRISMA MARINE
+    void marineWaypointChanged      (bool marineWaypoint);
+    // END CUSTOM
 
 private slots:
     void _setDirty                              (void);
@@ -165,6 +174,10 @@ private slots:
     void _possibleVehicleYawChanged             (void);
     void _signalIfVTOLTransitionCommand         (void);
     void _possibleRadiusChanged                 (void);
+    // CUSTOM PRISMA MARINE
+    void _updateMarineWaypoint                  (void);
+    void _marineAltThresholdChanged             (void);
+    // END CUSTOM
 
 private:
     void _connectSignals        (void);
@@ -172,6 +185,10 @@ private:
     void _updateOptionalSections(void);
     void _rebuildNaNFacts       (void);
     void _rebuildComboBoxFacts  (void);
+    // CUSTOM PRISMA MARINE
+    void _setupMarineWaypointFact(void);
+    bool _isMarineWaypoint      (void) const;
+    // END CUSTOM
 
     MissionItem     _missionItem;
     bool            _rawEdit =                  false;
@@ -189,6 +206,10 @@ private:
     QGroundControlQmlGlobal::AltMode    _altitudeMode = QGroundControlQmlGlobal::AltitudeModeRelative;
     Fact                                _altitudeFact;
     Fact                                _amslAltAboveTerrainFact;
+    // CUSTOM PRISMA MARINE
+    Fact*                               _marineAltThresholdFact = nullptr;
+    bool                                _marineWaypoint = false;
+    // END CUSTOM
 
     QmlObjectListModel  _textFieldFacts;
     QmlObjectListModel  _nanFacts;

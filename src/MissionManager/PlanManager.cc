@@ -527,6 +527,13 @@ void PlanManager::_handleMissionRequest(const mavlink_message_t& message)
     if (!weakLink.expired()) {
         mavlink_message_t       messageOut;
         SharedLinkInterfacePtr  sharedLink = weakLink.lock();
+        // CUSTOM PRISMA MARINE
+        MAV_FRAME effectiveFrame = item->frame();
+
+        if (effectiveFrame == MAV_FRAME_GLOBAL_TERRAIN_ALT || effectiveFrame == MAV_FRAME_GLOBAL_TERRAIN_ALT_INT) {
+            effectiveFrame = MAV_FRAME_GLOBAL_RELATIVE_ALT;
+        }
+        // END CUSTOM
 
         mavlink_msg_mission_item_int_pack_chan(qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
                                                qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
@@ -535,7 +542,10 @@ void PlanManager::_handleMissionRequest(const mavlink_message_t& message)
                                                _vehicle->id(),
                                                MAV_COMP_ID_AUTOPILOT1,
                                                missionRequestSeq,
-                                               item->frame(),
+                                               // CUSTOM PRISMA MARINE
+                                               effectiveFrame,
+                                               //item->frame(),
+                                               // END CUSTOM
                                                item->command(),
                                                missionRequestSeq == 0,
                                                item->autoContinue(),
@@ -543,8 +553,12 @@ void PlanManager::_handleMissionRequest(const mavlink_message_t& message)
                                                item->param2(),
                                                item->param3(),
                                                item->param4(),
-                                               item->frame() == MAV_FRAME_MISSION ? item->param5() : item->param5() * 1e7,
-                                               item->frame() == MAV_FRAME_MISSION ? item->param6() : item->param6() * 1e7,
+                                               // CUSTOM PRISMA MARINE
+                                               effectiveFrame == MAV_FRAME_MISSION ? item->param5() : item->param5() * 1e7,
+                                               effectiveFrame == MAV_FRAME_MISSION ? item->param6() : item->param6() * 1e7,
+                                               //item->frame() == MAV_FRAME_MISSION ? item->param5() : item->param5() * 1e7,
+                                               //item->frame() == MAV_FRAME_MISSION ? item->param6() : item->param6() * 1e7,
+                                               // END CUSTOM
                                                item->param7(),
                                                _planType);
         _vehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), messageOut);

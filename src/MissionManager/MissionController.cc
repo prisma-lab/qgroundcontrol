@@ -1374,7 +1374,13 @@ void MissionController::_recalcFlightPathSegments(void)
                     lastSegmentVisualItemPair =  VisualItemPair(lastFlyThroughVI, visualItem);
                     if (!_flyView || addDirectionArrow) {
                         SimpleMissionItem* simpleItem = qobject_cast<SimpleMissionItem*>(lastFlyThroughVI);
-                        bool mavlinkTerrainFrame = simpleItem ? simpleItem->missionItem().frame() == MAV_FRAME_GLOBAL_TERRAIN_ALT : false;
+                        // CUSTOM PRISMA MARINE
+                        //bool mavlinkTerrainFrame = simpleItem ? simpleItem->missionItem().frame() == MAV_FRAME_GLOBAL_TERRAIN_ALT : false;
+                        bool mavlinkTerrainFrame = simpleItem
+                                ? (simpleItem->missionItem().frame() == MAV_FRAME_GLOBAL_TERRAIN_ALT ||
+                                   simpleItem->missionItem().frame() == MAV_FRAME_GLOBAL_TERRAIN_ALT_INT)
+                                : false;
+                        // END CUSTOM
                         FlightPathSegment* segment = _addFlightPathSegment(oldSegmentTable, lastSegmentVisualItemPair, mavlinkTerrainFrame);
                         segment->setSpecialVisual(roiActive);
                         if (addDirectionArrow) {

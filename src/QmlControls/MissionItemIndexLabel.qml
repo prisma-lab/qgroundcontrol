@@ -18,7 +18,12 @@ Canvas {
     property bool   small:                  !checked
     property bool   child:                  false
     property bool   highlightSelected:      false
-    property var    color:                  checked ? "green" : (child ? qgcPal.mapIndicatorChild : qgcPal.mapIndicator)
+    // CUSTOM PRISMA MARINE
+    //property var    color:                  checked ? "green" : (child ? qgcPal.mapIndicatorChild : qgcPal.mapIndicator)
+    property bool   marine:                 false
+    property var    marineColor:            "#1e90ff"
+    property var    color:                  checked ? "green" : (marine ? marineColor : (child ? qgcPal.mapIndicatorChild : qgcPal.mapIndicator))
+    // END CUSTOM
     property real   anchorPointX:           _height / 2
     property real   anchorPointY:           _height / 2
     property bool   specifiesCoordinate:    true

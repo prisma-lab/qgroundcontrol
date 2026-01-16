@@ -20,6 +20,10 @@
 #include "QGroundControlQmlGlobal.h"
 #include "SettingsManager.h"
 #include "PlanMasterController.h"
+// CUSTOM PRISMA MARINE
+#include "ParameterManager.h"
+#include "FactSystem.h"
+// END CUSTOM
 
 FactMetaData* SimpleMissionItem::_altitudeMetaData =        nullptr;
 FactMetaData* SimpleMissionItem::_commandMetaData =         nullptr;
@@ -73,6 +77,10 @@ SimpleMissionItem::SimpleMissionItem(PlanMasterController* masterController, boo
     if (!forLoad) {
         // We are are going to load the SimpleItem right after this then don't connnect up signalling until after load is done
         _connectSignals();
+        // CUSTOM PRISMA MARINE
+        _setupMarineWaypointFact();
+        _updateMarineWaypoint();
+        // END CUSTOM
         _updateOptionalSections();
         _setDefaultsForCommand();
         _rebuildFacts();
@@ -104,6 +112,9 @@ SimpleMissionItem::SimpleMissionItem(PlanMasterController* masterController, boo
 
     const struct MavFrame2AltMode_s rgMavFrame2AltMode[] = {
         { MAV_FRAME_GLOBAL_TERRAIN_ALT,     QGroundControlQmlGlobal::AltitudeModeTerrainFrame },
+        // CUSTOM PRISMA MARINE
+        { MAV_FRAME_GLOBAL_TERRAIN_ALT_INT, QGroundControlQmlGlobal::AltitudeModeTerrainFrame },
+        // END CUSTOM
         { MAV_FRAME_GLOBAL,                 QGroundControlQmlGlobal::AltitudeModeAbsolute },
         { MAV_FRAME_GLOBAL_RELATIVE_ALT,    QGroundControlQmlGlobal::AltitudeModeRelative },
     };
@@ -125,6 +136,10 @@ SimpleMissionItem::SimpleMissionItem(PlanMasterController* masterController, boo
         _setupMetaData();
     }
     _connectSignals();
+    // CUSTOM PRISMA MARINE
+    _setupMarineWaypointFact();
+    _updateMarineWaypoint();
+    // END CUSTOM
     _updateOptionalSections();
     if (!_flyView) {
         _rebuildFacts();
@@ -154,6 +169,11 @@ void SimpleMissionItem::_connectSignals(void)
     connect(&_altitudeFact,                     &Fact::valueChanged,                        this, &SimpleMissionItem::_altitudeChanged);
     connect(this,                               &SimpleMissionItem::altitudeModeChanged,    this, &SimpleMissionItem::_altitudeModeChanged);
     connect(this,                               &SimpleMissionItem::terrainAltitudeChanged, this, &SimpleMissionItem::_terrainAltChanged);
+    // CUSTOM PRISMA MARINE
+    connect(&_altitudeFact,                     &Fact::valueChanged,                        this, &SimpleMissionItem::_updateMarineWaypoint);
+    connect(&_missionItem._frameFact,           &Fact::valueChanged,                        this, &SimpleMissionItem::_updateMarineWaypoint);
+    connect(&_missionItem._commandFact,         &Fact::valueChanged,                        this, &SimpleMissionItem::_updateMarineWaypoint);
+    // END CUSTOM
 
     connect(this,                               &SimpleMissionItem::sequenceNumberChanged,  this, &SimpleMissionItem::lastSequenceNumberChanged);
     connect(this,                               &SimpleMissionItem::cameraSectionChanged,   this, &SimpleMissionItem::_setDirty);
@@ -1112,3 +1132,67 @@ void SimpleMissionItem::_possibleRadiusChanged(void)
         emit loiterRadiusChanged(loiterRadius());
     }
 }
+
+// CUSTOM PRISMA MARINE
+void SimpleMissionItem::_setupMarineWaypointFact(void)
+{
+    if (!_controllerVehicle) {
+        return;
+    }
+
+    ParameterManager* parameterManager = _controllerVehicle->parameterManager();
+    if (!parameterManager) {
+        return;
+    }
+
+    if (parameterManager->parameterExists(FactSystem::defaultComponentId, QStringLiteral("NAV_MAR_ALT_THR"))) {
+        _marineAltThresholdFact = parameterManager->getParameter(FactSystem::defaultComponentId, QStringLiteral("NAV_MAR_ALT_THR"));
+        connect(_marineAltThresholdFact, &Fact::valueChanged, this, &SimpleMissionItem::_marineAltThresholdChanged);
+    } else {
+        connect(parameterManager, &ParameterManager::factAdded, this, [this](int componentId, Fact* fact) {
+            if (_marineAltThresholdFact || !fact || componentId != FactSystem::defaultComponentId) {
+                return;
+            }
+            if (fact->name() == QStringLiteral("NAV_MAR_ALT_THR")) {
+                _marineAltThresholdFact = fact;
+                connect(_marineAltThresholdFact, &Fact::valueChanged, this, &SimpleMissionItem::_marineAltThresholdChanged);
+                _updateMarineWaypoint();
+            }
+        });
+    }
+}
+
+void SimpleMissionItem::_marineAltThresholdChanged(void)
+{
+    _updateMarineWaypoint();
+}
+
+bool SimpleMissionItem::_isMarineWaypoint(void) const
+{
+    const MAV_FRAME frame = _missionItem.frame();
+    if (frame == MAV_FRAME_GLOBAL_TERRAIN_ALT || frame == MAV_FRAME_GLOBAL_TERRAIN_ALT_INT) {
+        return true;
+    }
+
+    if (mavCommand() != MAV_CMD_NAV_WAYPOINT || !_marineAltThresholdFact) {
+        return false;
+    }
+
+    const double threshold = _marineAltThresholdFact->rawValue().toDouble();
+    const double altitude = _missionItem._param7Fact.rawValue().toDouble();
+    if (!qIsFinite(threshold) || !qIsFinite(altitude)) {
+        return false;
+    }
+
+    return qAbs(altitude) <= threshold;
+}
+
+void SimpleMissionItem::_updateMarineWaypoint(void)
+{
+    const bool marineWaypoint = _isMarineWaypoint();
+    if (marineWaypoint != _marineWaypoint) {
+        _marineWaypoint = marineWaypoint;
+        emit marineWaypointChanged(_marineWaypoint);
+    }
+}
+// END CUSTOM
