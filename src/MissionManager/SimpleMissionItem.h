@@ -92,6 +92,9 @@ public:
 
     void setRawEdit(bool rawEdit);
     void setAltitudeMode(QGroundControlQmlGlobal::AltMode altitudeMode);
+    // CUSTOM PRISMA MARINE
+    void updateFrameForMarineAltitude(void);
+    // END CUSTOM
     
     void setCommandByIndex(int index);
 

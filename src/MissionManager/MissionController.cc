@@ -233,6 +233,14 @@ void MissionController::sendToVehicle(void)
         qCWarning(MissionControllerLog) << "MissionControllerLog::sendToVehicle called while syncInProgress";
     } else {
         qCDebug(MissionControllerLog) << "MissionControllerLog::sendToVehicle";
+        // CUSTOM PRISMA MARINE
+        for (int i = 0; i < _visualItems->count(); i++) {
+            SimpleMissionItem* simpleItem = qobject_cast<SimpleMissionItem*>(_visualItems->get(i));
+            if (simpleItem) {
+                simpleItem->updateFrameForMarineAltitude();
+            }
+        }
+        // END CUSTOM
         if (_visualItems->count() == 1) {
             // This prevents us from sending a possibly bogus home position to the vehicle
             QmlObjectListModel emptyModel;
@@ -1974,6 +1982,9 @@ void MissionController::_initVisualItem(VisualMissionItem* visualItem)
         SimpleMissionItem* simpleItem = qobject_cast<SimpleMissionItem*>(visualItem);
         if (simpleItem) {
             connect(&simpleItem->missionItem()._commandFact, &Fact::valueChanged, this, &MissionController::_itemCommandChanged);
+            // CUSTOM PRISMA MARINE
+            connect(&simpleItem->missionItem()._frameFact,   &Fact::valueChanged, this, &MissionController::_recalcFlightPathSegmentsSignal, Qt::QueuedConnection);
+            // END CUSTOM
         } else {
             qWarning() << "isSimpleItem == true, yet not SimpleMissionItem";
         }
@@ -2343,7 +2354,9 @@ bool MissionController::showPlanFromManagerVehicle (void)
 void MissionController::_managerSendComplete(bool error)
 {
     // Fly view always reloads on send complete
-    if (!error && _flyView) {
+    // CUSTOM PRISMA MARINE
+    //if (!error && _flyView) {
+    if (!error) {
         showPlanFromManagerVehicle();
     }
 }

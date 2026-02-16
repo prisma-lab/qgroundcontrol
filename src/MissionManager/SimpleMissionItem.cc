@@ -1057,6 +1057,35 @@ void SimpleMissionItem::setAltitudeMode(QGroundControlQmlGlobal::AltMode altitud
     }
 }
 
+// CUSTOM PRISMA MARINE
+void SimpleMissionItem::updateFrameForMarineAltitude(void)
+{
+    if (mavCommand() != MAV_CMD_NAV_WAYPOINT || !_controllerVehicle) {
+        return;
+    }
+
+    ParameterManager* parameterManager = _controllerVehicle->parameterManager();
+    if (!parameterManager || !parameterManager->parameterExists(FactSystem::defaultComponentId, QStringLiteral("NAV_MAR_ALT_THR"))) {
+        return;
+    }
+
+    Fact* thresholdFact = parameterManager->getParameter(FactSystem::defaultComponentId, QStringLiteral("NAV_MAR_ALT_THR"));
+    if (!thresholdFact) {
+        return;
+    }
+
+    const double threshold = thresholdFact->rawValue().toDouble();
+    const double altitude = _missionItem._param7Fact.rawValue().toDouble();
+    if (!qIsFinite(threshold) || !qIsFinite(altitude)) {
+        return;
+    }
+
+    const bool useTerrainFrame = qAbs(altitude) <= threshold;
+    const MAV_FRAME desiredFrame = useTerrainFrame ? MAV_FRAME_GLOBAL_TERRAIN_ALT_INT : MAV_FRAME_GLOBAL_RELATIVE_ALT;
+    _missionItem.setFrame(desiredFrame);
+}
+// END CUSTOM
+
 double SimpleMissionItem::additionalTimeDelay(void) const
 {
     switch (command()) {
